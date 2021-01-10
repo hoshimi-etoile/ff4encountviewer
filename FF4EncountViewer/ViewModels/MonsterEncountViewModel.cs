@@ -26,7 +26,12 @@ namespace FF4EncountViewer.ViewModels
         public ReactiveProperty<string> EncountLog { get; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> EncountForecast { get; } = new ReactiveProperty<string>();
 
-        public ReactiveCollection<string> PlaceListItems { get; set; } = new ReactiveCollection<string>();
+        public class FieldData
+        {
+            public int ID { get; set; }
+            public string PlaceName { get; set; }
+        }
+        public ReactiveCollection<FieldData> PlaceListItems { get; set; } = new ReactiveCollection<FieldData>();
         public ReactiveCollection<Encount> NextAvailableEncounts { get; set; } = new ReactiveCollection<Encount>();
         //public ObservableCollection<Encount> NextAvailableEncounts { get; set; } = new ObservableCollection<Encount>();
         
@@ -75,7 +80,13 @@ namespace FF4EncountViewer.ViewModels
             Model.InitializeEncountTable();
 
             Model model = Model as Model;
-            model.encountTable.lstFieldName.ForEach(x => PlaceListItems.Add(x));
+            foreach(var x in model.encountTable.dictFieldName)
+            {
+                FieldData fd = new FieldData();
+                fd.ID = x.Key;
+                fd.PlaceName = x.Value;
+                PlaceListItems.Add(fd);
+            }
             model.Reset();
             SelectedPlaceItem.Value = 1;
             SetEncounts();
@@ -128,7 +139,8 @@ namespace FF4EncountViewer.ViewModels
                 {
                     Encount newEncount = new Encount();
                     newEncount.ID = i;
-                    newEncount.EncountName = $"{model.encountTable.pattern[SelectedPlaceItem.Value].party[i]}";
+                    FieldData fd = PlaceListItems[SelectedPlaceItem.Value];
+                    newEncount.EncountName = $"{model.encountTable.pattern[fd.ID].party[i]}";
                     NextAvailableEncounts.Add(newEncount);
                 }
             }
@@ -138,7 +150,8 @@ namespace FF4EncountViewer.ViewModels
             {
                 var tableIndices = model.CurrentAvailableTableIndex();
                 int partyIndex = model.encountTable.table[i, tableIndices[0]];
-                string partyPattern = model.encountTable.pattern[SelectedPlaceItem.Value].party[partyIndex];
+                FieldData fd = PlaceListItems[SelectedPlaceItem.Value];
+                string partyPattern = model.encountTable.pattern[fd.ID].party[partyIndex];
                 EncountLog.Value += $"{i} : {partyPattern}\n";
             }
 
@@ -154,7 +167,8 @@ namespace FF4EncountViewer.ViewModels
                 foreach(var tableIndex in tableIndices)
                 {
                     int partyIndex = model.encountTable.table[encountCounter, tableIndex];
-                    string partyPattern = model.encountTable.pattern[SelectedPlaceItem.Value].party[partyIndex];
+                    FieldData fd = PlaceListItems[SelectedPlaceItem.Value];
+                    string partyPattern = model.encountTable.pattern[fd.ID].party[partyIndex];
 
                     var array = (from x in lstEncountPatterns where x.partyPattern == partyPattern select x).ToArray();
                     if (array.Length == 0)

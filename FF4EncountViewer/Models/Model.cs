@@ -11,7 +11,7 @@ namespace FF4EncountViewer.Models
     {
         public readonly int[,] table = new int[254, 128];
         public List<MonsterPartyPattern> pattern { get; private set; }
-        public List<string> lstFieldName { get; private set; }
+        public Dictionary<int,string> dictFieldName { get; private set; }
         public EncountTable()
         {
             var lstFF4EncountTable = Model.LoadCSV("data/FF4.csv");
@@ -26,14 +26,14 @@ namespace FF4EncountViewer.Models
             var csvFieldIDToNameTable = Model.LoadCSV("data/ff4monenc.txt", ':',false);
             pattern = MonsterEncountParse(csvFieldIDToNameTable);
 
-            lstFieldName = new List<string>();
+            dictFieldName = new Dictionary<int, string>();
             var lstFF4FieldToName = Model.LoadCSV("data/FF4FieldIDToName.csv");
             foreach (var line in lstFF4FieldToName)
             {
                 if (line[0][0] == '#')
                     continue;
 
-                lstFieldName.Add(line[1]);
+                dictFieldName.Add(int.Parse(line[0]),line[1]);
             }
         }
 

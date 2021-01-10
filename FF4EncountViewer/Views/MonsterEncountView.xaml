@@ -31,7 +31,13 @@
                 <TextBlock Text="場所" Width="100" />
                 <ComboBox Height="30"
                       ItemsSource ="{Binding PlaceListItems}"
-                      SelectedIndex = "{Binding SelectedPlaceItem.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                      SelectedIndex = "{Binding SelectedPlaceItem.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding PlaceName}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </StackPanel>
             <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="2">
                 <TextBlock Text="エンカウント回数"/>
